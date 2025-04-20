@@ -26,17 +26,6 @@ This is a **React Native CLI** project developed as part of an assignment. The a
 
 ---
 
-## 📁 Folder Structure
-
-.
-├── App.tsx
-├── components/
-│   └── TaskScreen.tsx
-├── store/
-│   └── useTaskStore.ts
-
----
-
 ## 🚀 Setup Instructions
 
 1. **Clone the repository**
