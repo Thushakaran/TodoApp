@@ -45,10 +45,12 @@ This is a **React Native CLI** project developed as part of an assignment. The a
    cd todo-app
    
 2. Install dependencies
-   npm install
+    ```bash
+    npm install
 
 3. Start Metro Bundler
-   npx react-native start
+    ```bash
+    npx react-native start
 
 ---
 
@@ -81,9 +83,7 @@ This is a **React Native CLI** project developed as part of an assignment. The a
 
 ---
 
-## 🎨 Figma Design
 
-👉 Figma Link: Click to view
 
 
 
