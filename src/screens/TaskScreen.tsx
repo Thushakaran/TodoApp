@@ -1,155 +1,208 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
-import { TextInput, Button, Checkbox, IconButton, Card, Text } from 'react-native-paper';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import {
+  TextInput,
+  IconButton,
+  Card,
+  Text,
+  Button,
+} from 'react-native-paper';
 import { useTaskStore } from '../store/useTaskStore';
 
-export const TaskScreen = () => {
-  const [title, setTitle] = useState('');
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'all' | 'completed' | 'pending'>('all');
-  const { tasks, addTask, deleteTask, toggleTask, loadTasks, updateTask } = useTaskStore();
+const ACCENT = '#ff8000';
 
-  const loadTasksMemoized = useCallback(() => {
-    loadTasks();
-  }, [loadTasks]);
+const TaskScreen = () => {
+  const { tasks, addTask, deleteTask, toggleTask, updateTask, loadTasks } = useTaskStore();
+
+  const [title, setTitle] = useState('');
+  const [about, setAbout] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'all' | 'completed' | 'pending'>('all');
 
   useEffect(() => {
-    loadTasksMemoized();
-  }, [loadTasksMemoized]);
+    loadTasks();
+  }, []);
 
-  const handleAdd = () => {
-    if (title.trim()) {
-      addTask(title);
-      setTitle(''); // Reset input after adding a task
+  const handleSubmit = () => {
+    if (!title.trim()) return;
+
+    if (editingId) {
+      updateTask(editingId, title, about);
+    } else {
+      addTask(title, about);
     }
-  };
 
-  const handleEdit = (taskId: string, currentTitle: string) => {
-    setEditingTaskId(taskId);
-    setTitle(currentTitle);
-  };
-
-  const handleUpdate = () => {
-    if (editingTaskId && title.trim()) {
-      updateTask(editingTaskId, title); // Update task
-      setTitle('');
-      setEditingTaskId(null); // Clear editing state
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingTaskId(null);
     setTitle('');
+    setAbout('');
+    setEditingId(null);
   };
 
-  const handleDelete = (id: string) => {
-    deleteTask(id); // Optimistically delete the task
+  const handleEdit = (task: any) => {
+    setTitle(task.title);
+    setAbout(task.about);
+    setEditingId(task.id);
   };
 
-  // Filter tasks based on filter state
   const filteredTasks = tasks.filter((task) => {
     if (filter === 'completed') return task.completed;
     if (filter === 'pending') return !task.completed;
-    return true; // Show all tasks
+    return true;
   });
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        label={editingTaskId ? 'Edit Task' : 'New Task'}
-        value={title}
-        onChangeText={setTitle}
-        style={styles.input}
-      />
-      {editingTaskId ? (
-        <>
-          <Button mode="contained" onPress={handleUpdate} style={styles.button}>
-            Update Task
-          </Button>
-          <Button mode="outlined" onPress={handleCancelEdit} style={styles.button}>
-            Cancel
-          </Button>
-        </>
-      ) : (
-        <Button mode="contained" onPress={handleAdd} style={styles.button}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      {/* Input Section */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="Title..."
+          value={title}
+          onChangeText={setTitle}
+          mode="outlined"
+          style={styles.inputBox}
+          outlineColor={ACCENT}
+          activeOutlineColor={ACCENT}
+          textColor="white"
+          placeholderTextColor="#aaa"
+        />
+        <TextInput
+          placeholder="About..."
+          value={about}
+          onChangeText={setAbout}
+          mode="outlined"
+          style={styles.inputBox}
+          outlineColor={ACCENT}
+          activeOutlineColor={ACCENT}
+          textColor="white"
+          placeholderTextColor="#aaa"
+        />
+        <Button
+          mode="contained"
+          onPress={handleSubmit}
+          buttonColor={ACCENT}
+          textColor="white"
+          style={styles.addButtonBox}
+          labelStyle={{ fontSize: 16, fontWeight: 'bold' }}
+        >
           Add Task
-        </Button>
-      )}
-
-      {/* Filter Buttons */}
-      <View style={styles.filterContainer}>
-        <Button onPress={() => setFilter('all')} icon="view-list">
-          Show All
-        </Button>
-        <Button onPress={() => setFilter('completed')} icon="check-circle-outline">
-          Show Completed
-        </Button>
-        <Button onPress={() => setFilter('pending')} icon="clock-outline">
-          Show Pending
         </Button>
       </View>
 
+      {/* Filter Buttons */}
+      <View style={styles.filterRow}>
+        <Button onPress={() => setFilter('all')} textColor="white">All</Button>
+        <Button onPress={() => setFilter('completed')} textColor="white">Completed</Button>
+        <Button onPress={() => setFilter('pending')} textColor="white">Pending</Button>
+      </View>
+
       {/* Task List */}
-      <FlatList
-        data={filteredTasks}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Card style={styles.card}>
-            <Card.Content style={styles.taskRow}>
-              <Checkbox
-                status={item.completed ? 'checked' : 'unchecked'}
-                onPress={() => toggleTask(item.id)}
-              />
-              <Text style={[styles.taskText, item.completed && styles.completed]}>
-                {item.title}
-              </Text>
-              <IconButton
-                icon="delete"
-                onPress={() => handleDelete(item.id)} // Optimistic delete
-              />
-              <IconButton
-                icon="pencil"
-                onPress={() => handleEdit(item.id, item.title)} // Handle edit
-              />
-            </Card.Content>
-          </Card>
-        )}
-      />
-    </View>
+      {filteredTasks.length === 0 ? (
+        <View style={styles.emptyView}>
+          <Text style={styles.noTasks}>No tasks</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredTasks}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Card style={styles.card}>
+              <Card.Content style={styles.taskContent}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.title}>{item.title}</Text>
+                  <Text style={styles.about}>{item.about}</Text>
+                </View>
+                <View style={styles.icons}>
+                  <IconButton
+                    icon="pencil"
+                    iconColor={ACCENT}
+                    onPress={() => handleEdit(item)}
+                  />
+                  <IconButton
+                    icon="check"
+                    iconColor={item.completed ? 'green' : 'gray'}
+                    onPress={() => toggleTask(item.id)}
+                  />
+                  <IconButton
+                    icon="delete"
+                    iconColor={ACCENT}
+                    onPress={() => deleteTask(item.id)}
+                  />
+                </View>
+              </Card.Content>
+            </Card>
+          )}
+        />
+      )}
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#121212',
+    padding: 16,
   },
-  input: {
-    marginBottom: 8,
+  inputContainer: {
+    marginBottom: 20,
+    gap: 10,
   },
-  button: {
-    marginBottom: 16,
+  inputBox: {
+    backgroundColor: '#1e1e1e',
   },
-  filterContainer: {
+  addButtonBox: {
+    borderRadius: 8,
+    paddingVertical: 6,
+  },
+  filterRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 16,
+    marginBottom: 10,
   },
   card: {
-    marginBottom: 8,
+    backgroundColor: '#1e1e1e',
+    borderColor: ACCENT,
+    borderWidth: 1,
+    borderRadius: 12,
+    marginBottom: 12,
   },
-  taskRow: {
+  taskContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  about: {
+    color: 'lightgray',
+    fontSize: 14,
+  },
+  icons: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  taskText: {
+  emptyView: {
     flex: 1,
-    fontSize: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  completed: {
-    textDecorationLine: 'line-through',
-    color: 'gray',
+  noTasks: {
+    color: 'white',
+    fontSize: 18,
+    borderBottomColor: ACCENT,
+    borderBottomWidth: 2,
+    paddingBottom: 4,
   },
 });
 
