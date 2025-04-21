@@ -2,7 +2,9 @@
 
 This is a **React Native CLI** project developed as part of an assignment. The application is a basic **To-Do List** that allows users to manage daily tasks efficiently. It follows **Material Design** principles and uses **Zustand** for state management with **AsyncStorage** for persistent data storage.
 
+
 ---
+
 
 ## ✨ Features
 
@@ -14,7 +16,9 @@ This is a **React Native CLI** project developed as part of an assignment. The a
 - 💾 Data stored persistently using AsyncStorage
 - 📱 Modern UI using React Native Paper (Material Design)
 
+
 ---
+
 
 ## 🛠 Tech Stack
 
@@ -24,7 +28,9 @@ This is a **React Native CLI** project developed as part of an assignment. The a
 - **AsyncStorage** for persistent local data
 - **react-native-paper** for Material Design UI components
 
+
 ---
+
 
 ## 🚀 Setup Instructions
 
@@ -41,7 +47,9 @@ This is a **React Native CLI** project developed as part of an assignment. The a
     ```bash
     npx react-native start
 
+
 ---
+
 
 ## 📱 How to Run the App
 
@@ -58,19 +66,30 @@ This is a **React Native CLI** project developed as part of an assignment. The a
 
       npx react-native run-ios
 
+      
+
 ---
+
+
 
 ## 📹 Demo Video
 
-👉 Demo Video: https://drive.google.com/file/d/1wzFxbz22NiALaobgP_SsCpufuOU1Jy2F/view?usp=sharing
+👉 Demo Video: https://drive.google.com/file/d/1sSG_AIwHSxmbPhJ3trHfaO1KnsfSfTGY/view?usp=sharing
+
 
 ---
+
 
 ## 📸 Screenshots (Optional)
 
-![image](https://github.com/Thushakaran/TodoApp/blob/main/src/images/image.png)
+![image](https://github.com/Thushakaran/TodoApp/blob/main/src/images/ToDoApp.png)
+
 
 ---
+
+
+## 🎨 Figma Design
+👉 Figma Link: https://www.figma.com/design/0voUh3g2fDdGMbKNibqygj/To-Do-List-(Community)?node-id=42-188&p=f&t=PYitSXbMjt9piMOo-0
 
 
 
