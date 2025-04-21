@@ -14,10 +14,19 @@ import {
   Card,
   Text,
   Button,
+  Checkbox,
 } from 'react-native-paper';
 import { useTaskStore } from '../store/useTaskStore';
 
 const ACCENT = '#ff8000';
+
+// Define Task interface
+interface Task {
+  id: string;
+  title: string;
+  about: string;
+  completed: boolean;
+}
 
 const TaskScreen = () => {
   const { tasks, addTask, deleteTask, toggleTask, updateTask, loadTasks } = useTaskStore();
@@ -59,6 +68,10 @@ const TaskScreen = () => {
     setSelectedTaskId(selectedTaskId === taskId ? null : taskId);
   };
 
+  const handleToggleComplete = (taskId: string) => {
+    toggleTask(taskId);
+  };
+
   const handleShare = (taskId: string) => {
     setShareMenuVisible(true);
   };
@@ -98,7 +111,7 @@ const TaskScreen = () => {
   };
 
   // Edit dialog handlers
-  const showEditDialog = (task: any) => {
+  const showEditDialog = (task: Task) => {
     setEditTaskId(task.id);
     setEditTaskTitle(task.title);
     setEditTaskAbout(task.about);
@@ -173,9 +186,30 @@ const TaskScreen = () => {
 
       {/* Filter Buttons */}
       <View style={styles.filterRow}>
-        <Button onPress={() => setFilter('all')} textColor="white">All</Button>
-        <Button onPress={() => setFilter('completed')} textColor="white">Completed</Button>
-        <Button onPress={() => setFilter('pending')} textColor="white">Pending</Button>
+        <Button 
+          onPress={() => setFilter('all')} 
+          textColor="white"
+          mode={filter === 'all' ? 'contained' : 'text'}
+          buttonColor={filter === 'all' ? ACCENT : undefined}
+        >
+          All
+        </Button>
+        <Button 
+          onPress={() => setFilter('completed')} 
+          textColor="white"
+          mode={filter === 'completed' ? 'contained' : 'text'}
+          buttonColor={filter === 'completed' ? ACCENT : undefined}
+        >
+          Completed
+        </Button>
+        <Button 
+          onPress={() => setFilter('pending')} 
+          textColor="white"
+          mode={filter === 'pending' ? 'contained' : 'text'}
+          buttonColor={filter === 'pending' ? ACCENT : undefined}
+        >
+          Pending
+        </Button>
       </View>
 
       {/* Task List */}
@@ -190,10 +224,25 @@ const TaskScreen = () => {
           renderItem={({ item }) => (
             <View style={styles.taskContainer}>
               <TouchableOpacity onPress={() => handleTaskPress(item.id)}>
-                <Card style={styles.card}>
+                <Card style={[
+                  styles.card, 
+                  item.completed && styles.completedCard
+                ]}>
                   <Card.Content>
                     <View style={styles.taskHeader}>
-                      <Text style={styles.title}>{item.title}</Text>
+                      <View style={styles.titleSection}>
+                        <Checkbox
+                          status={item.completed ? 'checked' : 'unchecked'}
+                          onPress={() => handleToggleComplete(item.id)}
+                          color={ACCENT}
+                        />
+                        <Text style={[
+                          styles.title,
+                          item.completed && styles.completedText
+                        ]}>
+                          {item.title}
+                        </Text>
+                      </View>
                       <IconButton
                         icon="close"
                         iconColor={ACCENT}
@@ -202,7 +251,12 @@ const TaskScreen = () => {
                         style={styles.closeButton}
                       />
                     </View>
-                    <Text style={styles.about}>{item.about}</Text>
+                    <Text style={[
+                      styles.about,
+                      item.completed && styles.completedText
+                    ]}>
+                      {item.about}
+                    </Text>
                   </Card.Content>
                 </Card>
               </TouchableOpacity>
@@ -237,6 +291,16 @@ const TaskScreen = () => {
                       onPress={() => showEditDialog(item)}
                       style={styles.actionButton}
                       containerColor="#333"
+                    />
+                  </View>
+                  <View style={styles.actionButtonWrapper}>
+                    <IconButton
+                      icon={item.completed ? "undo" : "check"}
+                      iconColor="white"
+                      size={24}
+                      onPress={() => handleToggleComplete(item.id)}
+                      style={styles.actionButton}
+                      containerColor={item.completed ? "#555" : ACCENT}
                     />
                   </View>
                 </View>
@@ -425,10 +489,20 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
   },
+  completedCard: {
+    backgroundColor: '#1a1a1a',
+    borderColor: '#444',
+    opacity: 0.8,
+  },
   taskHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  titleSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   closeButton: {
     margin: 0,
@@ -454,11 +528,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     flex: 1,
+    marginLeft: 8,
+  },
+  completedText: {
+    color: '#888',
+    textDecorationLine: 'line-through',
   },
   about: {
     color: 'lightgray',
     fontSize: 14,
     marginTop: 4,
+    marginLeft: 40,
   },
   emptyView: {
     flex: 1,
