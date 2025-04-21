@@ -74,7 +74,7 @@ This is a **React Native CLI** project developed as part of an assignment. The a
 
 ## 📹 Demo Video
 
-👉 Demo Video: https://drive.google.com/file/d/1sSG_AIwHSxmbPhJ3trHfaO1KnsfSfTGY/view?usp=sharing
+👉 Demo Video: https://drive.google.com/file/d/1jM1WhWzzW4GnqJEWs1pfz1XSRJ-gIRbO/view?usp=sharing
 
 
 ---
