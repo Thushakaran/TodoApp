@@ -5,6 +5,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import {
   TextInput,
@@ -61,39 +62,40 @@ const TaskScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       {/* Input Section */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Title..."
-          value={title}
-          onChangeText={setTitle}
-          mode="outlined"
-          style={styles.inputBox}
-          outlineColor={ACCENT}
-          activeOutlineColor={ACCENT}
-          textColor="white"
-          placeholderTextColor="#aaa"
-        />
-        <TextInput
-          placeholder="About..."
-          value={about}
-          onChangeText={setAbout}
-          mode="outlined"
-          style={styles.inputBox}
-          outlineColor={ACCENT}
-          activeOutlineColor={ACCENT}
-          textColor="white"
-          placeholderTextColor="#aaa"
-        />
-        <Button
+      <View style={styles.inputWrapper}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="Title..."
+            value={title}
+            onChangeText={setTitle}
+            mode="outlined"
+            style={styles.inputBox}
+            outlineColor={ACCENT}
+            activeOutlineColor={ACCENT}
+            textColor="white"
+            placeholderTextColor="#aaa"
+          />
+          <TextInput
+            placeholder="About..."
+            value={about}
+            onChangeText={setAbout}
+            mode="outlined"
+            style={styles.inputBox}
+            outlineColor={ACCENT}
+            activeOutlineColor={ACCENT}
+            textColor="white"
+            placeholderTextColor="#aaa"
+          />
+        </View>
+        <IconButton
+          icon="plus"
           mode="contained"
           onPress={handleSubmit}
-          buttonColor={ACCENT}
-          textColor="white"
-          style={styles.addButtonBox}
-          labelStyle={{ fontSize: 16, fontWeight: 'bold' }}
-        >
-          Add Task
-        </Button>
+          containerColor={ACCENT}
+          iconColor="white"
+          size={32}
+          style={styles.addButton}
+        />
       </View>
 
       {/* Filter Buttons */}
@@ -113,31 +115,33 @@ const TaskScreen = () => {
           data={filteredTasks}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <Card style={styles.card}>
-              <Card.Content style={styles.taskContent}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.title}>{item.title}</Text>
-                  <Text style={styles.about}>{item.about}</Text>
-                </View>
-                <View style={styles.icons}>
-                  <IconButton
-                    icon="pencil"
-                    iconColor={ACCENT}
-                    onPress={() => handleEdit(item)}
-                  />
-                  <IconButton
-                    icon="check"
-                    iconColor={item.completed ? 'green' : 'gray'}
-                    onPress={() => toggleTask(item.id)}
-                  />
-                  <IconButton
-                    icon="delete"
-                    iconColor={ACCENT}
-                    onPress={() => deleteTask(item.id)}
-                  />
-                </View>
-              </Card.Content>
-            </Card>
+            <TouchableOpacity onPress={() => handleEdit(item)}>
+              <Card style={styles.card}>
+                <Card.Content style={styles.taskContent}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.title}>{item.title}</Text>
+                    <Text style={styles.about}>{item.about}</Text>
+                  </View>
+                  <View style={styles.taskActions}>
+                    <IconButton
+                      icon="pencil"
+                      iconColor={ACCENT}
+                      onPress={() => handleEdit(item)}
+                    />
+                    <IconButton
+                      icon="check"
+                      iconColor={item.completed ? 'green' : 'gray'}
+                      onPress={() => toggleTask(item.id)}
+                    />
+                    <IconButton
+                      icon="delete"
+                      iconColor={ACCENT}
+                      onPress={() => deleteTask(item.id)}
+                    />
+                  </View>
+                </Card.Content>
+              </Card>
+            </TouchableOpacity>
           )}
         />
       )}
@@ -151,16 +155,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
     padding: 16,
   },
-  inputContainer: {
-    marginBottom: 20,
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
+    marginBottom: 16,
+  },
+  inputContainer: {
+    flex: 1,
+    gap: 8,
   },
   inputBox: {
     backgroundColor: '#1e1e1e',
+    height: 35,
   },
-  addButtonBox: {
-    borderRadius: 8,
-    paddingVertical: 6,
+  addButton: {
+    borderRadius: 12,
+    width: 70,
+    height: 70,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   filterRow: {
     flexDirection: 'row',
@@ -170,13 +184,18 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#1e1e1e',
     borderColor: ACCENT,
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 12,
     marginBottom: 12,
   },
   taskContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 8,
+  },
+  taskActions: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
   title: {
@@ -187,10 +206,6 @@ const styles = StyleSheet.create({
   about: {
     color: 'lightgray',
     fontSize: 14,
-  },
-  icons: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   emptyView: {
     flex: 1,
